@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1349355274 source:/home/andrew/workspace/MST/main.cpp
+	<iostream>
+	<fstream>
+	<map>
+	<deque>
+	<cstdlib>
+	<vector>
+	<string>
+	<list>
+
+1350130486 source:/media/multimedia/Programming/MST/main.cpp
+	<iostream>
+	<fstream>
+	<map>
+	<deque>
+	<cstdlib>
+	<vector>
+	<string>
+	<list>
+
