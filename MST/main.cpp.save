@@ -1,0 +1,121 @@
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <deque>
+#include <cstdlib>
+#include <vector>
+#include <string>
+#include <list>
+
+using namespace std;
+ifstream in;
+fstream out;
+
+bool isBlack (vector <string> color) {
+    for (int i=0; i<color.size(); ++i) {
+        if (color[i]!="black")
+            return false;
+    }
+    return true;
+}
+class graph {
+private:
+    deque < map <int, int> > vertex;
+public:
+    graph (deque < map <int, int> > v) {
+        vertex=v;
+    }
+    graph () {
+        in.open("input.txt");
+        int k;
+        in >> k;
+        for (int i=0; i<k; ++i) {
+            map <int, int> links;
+            int x,a,b;
+            in >> x;
+            for (int j=0; j<x; ++j) {
+                in >> a >> b;
+                links.insert(make_pair(a,b));
+            }
+            vertex.push_back(links);
+        }
+        in.close();
+    }
+    void print () const {
+        system ("touch graph.txt");
+        out.open("graph.txt");
+        out << "digraph G {" << endl;
+        this->DFS(true);
+        out << "}";
+        out.close();
+        system("dot graph.txt -o graph.png -T png");
+        system ("rm graph.txt");
+        system("okular graph.png");
+    }
+    void BFS (int s=0, bool print=0) const {
+        vector <string> color(vertex.size(), "white");
+        vector <int> parent (vertex.size(), -1);
+        list <int> Q;
+        Q.push_front(s);
+        while (!Q.empty()) {
+            int current = Q.front();
+            for (map <int, int>::const_iterator it=vertex[current].begin(); it!=vertex[current].end(); ++it) {
+                if (print)
+                    out << current+1 << " -> " <<  it->first+1 << endl;
+                else 
+                    cout << current+1 << " -> " <<  it->first+1 << endl;
+                if (color[it->first]=="white") {
+                    color[it->first]="gray";
+                    parent[it->first]=current;
+                    Q.push_back(it->first);
+                }
+            }
+            Q.pop_front();
+            color[current]="black";
+            if (!print)
+                cout << current+1 << ' ' << "black" << endl;
+        }
+        if (!isBlack(color)) {
+            cout << "There is some vertexes are not avaible from " << s+1 << " vertex." << endl;
+        }
+    }
+    void DFS_Visit (vector <string> &color, vector <int> &parent, vector <int> &inTime, vector <int> &outTime,
+    int current, int &time, bool print) const {
+        color[current]="gray";
+        inTime[current]=++time;
+        for (map <int, int>::const_iterator it=vertex[current].begin(); it!=vertex[current].end(); ++it) {
+            if (print)
+                out << current+1 << " -> " <<  it->first+1 << endl;
+            else 
+                cout << current+1 << " -> " <<  it->first+1 << endl;
+            if (color[it->first]=="white") {
+                parent[it->first]=current;
+                this->DFS_Visit(color, parent, inTime, outTime, it->first, time, print);
+            }
+        }
+        color[current]="black";
+        outTime[current]=++time;
+        return;
+    }
+    void DFS (bool print=0) const {
+        vector <string> color(vertex.size(), "white");
+        vector <int> parent(vertex.size(), -1), inTime(vertex.size()), outTime(vertex.size());
+        int time=0;
+        for (int i=0; i<vertex.size(); ++i) {
+            if (color[i]=="white")
+                this->DFS_Visit(color, parent, inTime, outTime, i, time, print);
+        }
+    }
+    int get_count () const {
+        return vertex.size();
+    }
+    deque <map <int, int> > get_vertex () const {
+        return vertex;
+    }
+};
+int main() {
+
+    graph G;
+    G.print();
+    return 0;
+}
